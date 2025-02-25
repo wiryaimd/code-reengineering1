@@ -78,17 +78,22 @@ public class PadTreeNodeDecorator extends AbstractTreeNodeDecorator {
         ConsoleText baseContent = baseNode.content();
         ConsoleText[] baseLines = TextUtil.linesOf(baseContent);
         int baseWidth = baseContent.dimensions().width();
-        
-        StringBuilder resultBuilder = new StringBuilder();
-        appendTopPadding(resultBuilder, baseWidth);
-        appendPaddedContentLines(resultBuilder, baseLines, baseWidth);
-        appendBottomPadding(resultBuilder, baseWidth);
-        
+
+        String resultBuilder = cek(baseWidth, baseLines);
+
         String decoratedContent = resultBuilder.toString();
         boolean isPlain = (baseNode instanceof PlainConsoleText) && (format == AnsiFormat.NONE);
         return isPlain ? ConsoleText.of(decoratedContent) : ConsoleText.ofAnsi(decoratedContent);
     }
-    
+
+    private String cek(int baseWidth, ConsoleText[] baseLines) {
+        StringBuilder resultBuilder = new StringBuilder();
+        appendTopPadding(resultBuilder, baseWidth);
+        appendPaddedContentLines(resultBuilder, baseLines, baseWidth);
+        appendBottomPadding(resultBuilder, baseWidth);
+        return resultBuilder.toString();
+    }
+
     private void appendTopPadding(StringBuilder stringBuilder, int width) {
         appendEmptyLines(stringBuilder, insets.top(), insets.left() + width + insets.right());
     }
