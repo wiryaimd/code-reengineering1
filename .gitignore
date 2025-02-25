@@ -1,0 +1,12 @@
+.directory
+*.class
+*.jar
+*.java.swp
+*.java.swo
+/bin/
+/build/
+/.gradle/
+/.idea/
+/.settings/
+/.classpath
+/.project

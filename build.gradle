@@ -1,0 +1,145 @@
+plugins {
+    id 'java-library'
+    id 'eclipse'
+    id 'signing'
+    id 'maven-publish'
+    id 'com.palantir.git-version' version '0.15.0'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+}
+
+sourceCompatibility = "1.8";
+targetCompatibility = "1.8";
+
+group = 'hu.webarticum'
+description = 'Simple Java library for visualizing tree structures in the command line'
+
+def moduleName = 'hu.webarticum.treeprinter'
+def scmUrl = 'https://github.com/davidsusu/tree-printer.git'
+def websiteUrl = scmUrl.replaceAll(/\.git$/, "");
+
+def versionMatcher = gitVersion() =~ /^v?(\d+\.\d+\.)(\d+)(.*)$/
+if (versionMatcher.size() > 0) {
+    def versionMatch = versionMatcher[0]
+	def isVersionDirty = !versionMatch[3].isEmpty()
+	def versionPrefix = versionMatch[1]
+	def versionPatch = isVersionDirty ? (Integer.parseInt(versionMatch[2]) + 1) + "" : versionMatch[2];
+	def versionSuffix = isVersionDirty ? "-SNAPSHOT" : ""
+    version versionPrefix + versionPatch + versionSuffix
+} else {
+    version '0.1.0-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+    demo
+}
+
+sourceSets {
+    demo {
+        java {
+            srcDirs = ['src/demo/java']
+        }
+    }
+}
+
+dependencies {
+    demoImplementation sourceSets.main.output
+    
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.1'
+    testImplementation 'org.assertj:assertj-core:3.19.0'
+}
+
+defaultTasks 'build'
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+jar {
+    manifest {
+        attributes('Automatic-Module-Name': moduleName)
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+signing {
+    required { true }
+    sign configurations.archives
+    sign publishing.publications.mavenJava
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'failed'
+        showExceptions true
+        exceptionFormat 'full'
+        showCauses true
+        showStackTraces true
+        showStandardStreams false
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
+    options.deprecation = true
+}
+
+task demo(type: JavaExec) {
+    dependsOn build
+    group = "Execution"
+    description = "Run the demo class specified with the demoMain property"
+    classpath = sourceSets.demo.runtimeClasspath
+    main = project.findProperty('demoMain')
+}
+
+project.plugins.withType(MavenPublishPlugin).all {
+    PublishingExtension publishing = project.extensions.getByType(PublishingExtension)
+    publishing.publications.withType(MavenPublication).all { mavenPublication ->
+        mavenPublication.pom {
+            name = project.name
+            description = project.description
+            url = websiteUrl
+            licenses {
+                license {
+                    name = 'The Apache Software License, Version 2.0'
+                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution = 'repo'
+                }
+            }
+            scm {
+                connection = 'scm:git:' + scmUrl
+                developerConnection = 'scm:git:' + scmUrl
+                url = scmUrl
+            }
+            developers {
+                developer {
+                    id = 'davidsusu'
+                    name = 'Dávid Horváth'
+                    email = 'horvath@webarticum.hu'
+                }
+            }
+        }
+    }
+}
