@@ -17,7 +17,6 @@ import hu.webarticum.treeprinter.text.ConsoleText;
 /**
  * Smell yang ada di dalam file:
  * 1. Long Method		: solusinya extract method
- * 2. Duplicate Code	: Dibuat method seperti createPaddedNode(...) dan createJustifiedShadowedNode(...) untuk menghindari duplicate code  
  *
  */
 
