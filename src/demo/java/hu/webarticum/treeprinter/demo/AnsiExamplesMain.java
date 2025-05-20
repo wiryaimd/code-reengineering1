@@ -14,31 +14,53 @@ import hu.webarticum.treeprinter.printer.traditional.TraditionalTreePrinter;
 import hu.webarticum.treeprinter.text.AnsiFormat;
 import hu.webarticum.treeprinter.text.ConsoleText;
 
-public class AnsiExamplesMain {
-    // tes
-    public static void main(String[] args) {
-        SimpleTreeNode rootNode = new SimpleTreeNode(ConsoleText.of("Root").format(
-                AnsiFormat.UNDERLINE.compose(AnsiFormat.BOLD).compose(AnsiFormat.RED)));
-        
-        SimpleTreeNode childNode1 = new SimpleTreeNode(
-                ConsoleText.of("Child 1").format(AnsiFormat.GREEN.compose(AnsiFormat.BOLD)));
-        rootNode.addChild(new BorderTreeNodeDecorator(childNode1, AnsiFormat.RED));
-        
-        SimpleTreeNode childNode2 = new SimpleTreeNode("Child 2");
-        rootNode.addChild(childNode2);
+/**
+ * Smell yang ada di dalam file:
+ * 1. Long Method		: solusinya extract method
+ * 2. Duplicate Code	: Dibuat method seperti createPaddedNode(...) dan createJustifiedShadowedNode(...) untuk menghindari duplicate code  
+ *
+ */
 
-        SimpleTreeNode grandChildNode21 = new SimpleTreeNode(
-                ConsoleText.of("Grandchild ").concat(ConsoleText.of("2-1").format(AnsiFormat.MAGENTA)));
+public class AnsiExamplesMain {
+	
+    public static SimpleTreeNode createRootNode() {
+    	return new SimpleTreeNode(ConsoleText.of("Root").format(AnsiFormat.UNDERLINE.compose(AnsiFormat.BOLD).compose(AnsiFormat.RED)));
+    }
+    
+    public static SimpleTreeNode createChildNode1() {
+    	return new SimpleTreeNode(ConsoleText.of("Child 1").format(AnsiFormat.GREEN.compose(AnsiFormat.BOLD)));
+    }
+    
+    public static SimpleTreeNode createChildNode2() {
+    	SimpleTreeNode childNode2 = new SimpleTreeNode("Child 2");
+
+        SimpleTreeNode grandChildNode21 = createGrandChildNode21();
         childNode2.addChild(grandChildNode21);
 
         SimpleTreeNode grandGrandChildNode211 = new SimpleTreeNode("Grand-grandchild 2-1-1");
-        grandChildNode21.addChild(PadTreeNodeDecorator.builder()
+        grandChildNode21.addChild(createPaddedNode(grandGrandChildNode211));
+
+        SimpleTreeNode grandChildNode22 = createGrandChildNode22();
+        childNode2.addChild(createJustifiedShadowedNode(grandChildNode22));
+
+        return childNode2;
+    }
+    
+    private static SimpleTreeNode createGrandChildNode21() {
+        return new SimpleTreeNode(
+                ConsoleText.of("Grandchild ").concat(ConsoleText.of("2-1").format(AnsiFormat.MAGENTA)));
+    }
+
+    private static PadTreeNodeDecorator createPaddedNode(SimpleTreeNode node) {
+        return PadTreeNodeDecorator.builder()
                 .verticalPad(1)
                 .horizontalPad(2)
                 .format(AnsiFormat.BG_YELLOW)
-                .buildFor(grandGrandChildNode211));
-        
-        SimpleTreeNode grandChildNode22 = new SimpleTreeNode(
+                .buildFor(node);
+    }
+
+    private static SimpleTreeNode createGrandChildNode22() {
+        return new SimpleTreeNode(
                 ConsoleText.of("Grandchild ")
                         .concat(ConsoleText.of("2-2").format(AnsiFormat.CYAN))
                         .breakLine()
@@ -46,7 +68,10 @@ public class AnsiExamplesMain {
                         .breakLine()
                         .concat(ConsoleText.of("Line line 3").format(AnsiFormat.MAGENTA))
                         .format(AnsiFormat.BOLD));
-        childNode2.addChild(new ShadowTreeNodeDecorator(
+    }
+
+    private static ShadowTreeNodeDecorator createJustifiedShadowedNode(SimpleTreeNode node) {
+        return new ShadowTreeNodeDecorator(
                 JustifyTreeNodeDecorator.builder()
                         .minimumHeight(5)
                         .minimumWidth(20)
@@ -54,18 +79,20 @@ public class AnsiExamplesMain {
                         .horizontalAlign(HorizontalAlign.CENTER)
                         .background('~')
                         .backgroundFormat(AnsiFormat.CYAN)
-                        .buildFor(grandChildNode22), AnsiFormat.BLUE));
-        
-        new ListingTreePrinter(AnsiFormat.CYAN).print(new AnsiFormatTreeNodeDecorator(rootNode, AnsiFormat.BOLD));
-        
-        System.out.println();
-        System.out.println();
-        
+                        .buildFor(node),
+                AnsiFormat.BLUE);
+    }
+
+    private static void printTreeVariants(SimpleTreeNode rootNode) {
+        new ListingTreePrinter(AnsiFormat.CYAN)
+                .print(new AnsiFormatTreeNodeDecorator(rootNode, AnsiFormat.BOLD));
+
+        System.out.println("\n\n");
+
         new TraditionalTreePrinter(AnsiFormat.BLUE).print(rootNode);
-        
-        System.out.println();
-        System.out.println();
-        
+
+        System.out.println("\n\n");
+
         BoxingTreePrinter.builder()
                 .defaultFormat(AnsiFormat.CYAN)
                 .levelFormat(1, AnsiFormat.YELLOW)
@@ -73,5 +100,5 @@ public class AnsiExamplesMain {
                 .build()
                 .print(rootNode);
     }
-    
+
 }
