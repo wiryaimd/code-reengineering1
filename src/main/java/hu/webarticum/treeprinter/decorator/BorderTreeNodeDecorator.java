@@ -85,27 +85,36 @@ public class BorderTreeNodeDecorator extends AbstractTreeNodeDecorator {
     @Override
     public ConsoleText decoratedContent() {
         ConsoleText baseContent = baseNode.content();
-        String contentString = baseContent.ansi();
-        String[] contentLines = TextUtil.linesOf(contentString);
+        String[] contentLines = TextUtil.linesOf(baseContent.ansi());
         int baseWidth = baseContent.dimensions().width();
-        
-        StringBuilder resultBuilder = new StringBuilder();
-        
-        resultBuilder.append(formatBorder(composeRoofString(baseWidth)).ansi());
-        resultBuilder.append('\n');
-        for (String contentLine: contentLines) {
-            resultBuilder.append(formatBorder(left).ansi());
-            resultBuilder.append(contentLine);
-            TextUtil.repeat(resultBuilder, ' ', baseWidth - contentLine.length());
-            resultBuilder.append(formatBorder(right).ansi());
-            resultBuilder.append('\n');
-        }
-        resultBuilder.append(formatBorder(composeBeddingString(baseWidth)).ansi());
-        
-        String decoratedContent = resultBuilder.toString();
+
+        String decoratedContent = buildDecoratedContent(contentLines, baseWidth);
+
         boolean isPlain = (baseNode instanceof PlainConsoleText) && (format == AnsiFormat.NONE);
         return isPlain ? ConsoleText.of(decoratedContent) : ConsoleText.ofAnsi(decoratedContent);
     }
+
+    private String buildDecoratedContent(String[] contentLines, int baseWidth) {
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append(formatBorder(composeRoofString(baseWidth)).ansi()).append('\n');
+
+        for (String line : contentLines) {
+            resultBuilder.append(buildContentLine(line, baseWidth));
+        }
+
+        resultBuilder.append(formatBorder(composeBeddingString(baseWidth)).ansi());
+        return resultBuilder.toString();
+    }
+
+    private String buildContentLine(String line, int width) {
+        StringBuilder lineBuilder = new StringBuilder();
+        lineBuilder.append(formatBorder(left).ansi());
+        lineBuilder.append(line);
+        TextUtil.repeat(lineBuilder, ' ', width - line.length());
+        lineBuilder.append(formatBorder(right).ansi()).append('\n');
+        return lineBuilder.toString();
+    }
+
 
     private ConsoleText formatBorder(char borderChar) {
         return formatBorder("" + borderChar);
