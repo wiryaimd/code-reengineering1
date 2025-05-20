@@ -134,7 +134,10 @@ public class BoxingTreePrinter implements TreePrinter {
     public String stringify(TreeNode rootNode) {
         return getLevelAsString(rootNode, 0);
     }
-    
+
+
+    // bloaters: long method
+    // treatment: extract method
     private String getLevelAsString(TreeNode rootNode, int level) {
         List<TreeNode> children = rootNode.children();
         if (!displayPlaceholders) {
@@ -146,32 +149,46 @@ public class BoxingTreePrinter implements TreePrinter {
         if (children.isEmpty()) {
             return boxIfEnabled(rootContent, level);
         }
-        
+
         StringBuilder resultBuilder = new StringBuilder();
         LineBuffer lineBuffer = Util.createLineBuffer(resultBuilder, ansiMode);
-        int leftOffset = 1 + insets.left();
-        int topHeight = dimensions.height() + 2;
-        int topOffset = topHeight + insets.top();
+
+        Offset offset = calcOffset(dimensions);
+
         Dimensions subDimensions;
         if (horizontalLevels.contains(level)) {
-            subDimensions = writeItemsHorizontally(lineBuffer, leftOffset, topOffset, children, level);
+            subDimensions = writeItemsHorizontally(lineBuffer, offset, children, level);
         } else {
-            subDimensions = writeItemsVertically(lineBuffer, leftOffset, topOffset, children, level);
+            subDimensions = writeItemsVertically(lineBuffer, offset, children, level);
         }
+
         int innerWidth = Math.max(dimensions.width() + 4, subDimensions.width() + insets.left() + insets.right());
         int topDiff = writeTop(lineBuffer, level, rootContent, innerWidth);
-        int verticalLineTop = topHeight - topDiff;
+        int verticalLineTop = getTopHeight(dimensions) - topDiff;
         int verticalLineHeight = subDimensions.height() + topDiff + insets.top() + insets.bottom();
-        int bottomOffset = topOffset + subDimensions.height() + insets.bottom();
+        int bottomOffset = getTopHeight(dimensions) + subDimensions.height() + insets.bottom();
+
         writeBottom(lineBuffer, level, bottomOffset, innerWidth);
         writeLeft(lineBuffer, level, verticalLineTop, verticalLineHeight);
         writeRight(lineBuffer, level, innerWidth + 1, verticalLineTop, verticalLineHeight);
         lineBuffer.flush();
         return resultBuilder.toString();
     }
-    
-    private Dimensions writeItemsVertically(
-            LineBuffer lineBuffer, int leftOffset, int topOffset, List<TreeNode> nodes, int level) {
+
+    private Offset calcOffset(Dimensions dimensions) {
+        // treatment: replace temp with query
+        int leftOffset = 1 + insets.left();
+        int topOffset = getTopHeight(dimensions) + insets.top();
+        return new Offset(topOffset, leftOffset);
+    }
+
+    private int getTopHeight(Dimensions dimensions) {
+        return dimensions.height() + 2;
+    }
+
+    // bloaters: long parameter list
+    // treatment: introduce parameter object
+    private Dimensions writeItemsVertically(LineBuffer lineBuffer, Offset offset, List<TreeNode> nodes, int level) {
         int width = 0;
         int height = 0;
         boolean first = true;
@@ -184,7 +201,7 @@ public class BoxingTreePrinter implements TreePrinter {
             String itemContentString = getLevelAsString(node, level + 1);
             ConsoleText itemContent = Util.toConsoleText(itemContentString, ansiMode);
             Dimensions childDimensions = itemContent.dimensions();
-            lineBuffer.write(topOffset + height, leftOffset, itemContent);
+            lineBuffer.write(offset.getTopOffset() + height, offset.getLeftOffset(), itemContent);
             height += childDimensions.height();
             int childWidth = childDimensions.width();
             if (childWidth > width) {
@@ -194,8 +211,9 @@ public class BoxingTreePrinter implements TreePrinter {
         return new Dimensions(width, height);
     }
 
-    private Dimensions writeItemsHorizontally(
-            LineBuffer lineBuffer, int leftOffset, int topOffset, List<TreeNode> nodes, int level) {
+    // bloaters: long parameter list
+    // treatment: introduce parameter object
+    private Dimensions writeItemsHorizontally(LineBuffer lineBuffer, Offset offset, List<TreeNode> nodes, int level) {
         int width = 0;
         int height = 0;
         boolean first = true;
@@ -208,7 +226,7 @@ public class BoxingTreePrinter implements TreePrinter {
             String itemContentString = getLevelAsString(node, level + 1);
             ConsoleText itemContent = Util.toConsoleText(itemContentString, ansiMode);
             Dimensions childDimensions = itemContent.dimensions();
-            lineBuffer.write(topOffset, leftOffset + width, itemContent);
+            lineBuffer.write(offset.getTopOffset(), offset.getLeftOffset() + width, itemContent);
             width += childDimensions.width();
             int childHeight = childDimensions.height();
             if (childHeight > height) {
