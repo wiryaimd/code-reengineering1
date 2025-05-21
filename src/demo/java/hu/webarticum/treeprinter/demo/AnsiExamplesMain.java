@@ -21,6 +21,18 @@ import hu.webarticum.treeprinter.text.ConsoleText;
  */
 
 public class AnsiExamplesMain {
+
+	public static void main(String[] args) {
+        SimpleTreeNode rootNode = createRootNode();
+
+        SimpleTreeNode childNode1 = createChildNode1();
+        rootNode.addChild(new BorderTreeNodeDecorator(childNode1, AnsiFormat.RED));
+
+        SimpleTreeNode childNode2 = createChildNode2();
+        rootNode.addChild(childNode2);
+
+        printTreeVariants(rootNode);
+    }
 	
     public static SimpleTreeNode createRootNode() {
     	return new SimpleTreeNode(ConsoleText.of("Root").format(AnsiFormat.UNDERLINE.compose(AnsiFormat.BOLD).compose(AnsiFormat.RED)));
