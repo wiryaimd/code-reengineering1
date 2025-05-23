@@ -9,40 +9,16 @@ import hu.webarticum.treeprinter.text.Dimensions;
 import hu.webarticum.treeprinter.text.PlainConsoleText;
 import hu.webarticum.treeprinter.text.TextUtil;
 
-/**
- * {@link TreeNode} decorator implementation that draws a border around the node.
- * 
- * <p>For example, with the default options this content:</p>
- * 
- * <pre>
- * Hello, Node!
- * </pre>
- * 
- * <p>will be transformed to this:</p>
- * 
- * <pre>
- * 
- * Hello, Node!
- *  ▒▒▒▒▒▒▒▒▒▒▒▒
- * </pre>
- */
 public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
-    
+
     private static final char EMPTY_CHAR = ' ';
-
     private static final char UNICODE_SHADOW_CHAR = '\u2592';
-
     private static final char ASCII_SHADOW_CHAR = '#';
-    
-    
+
     private final char shadowChar;
-    
     private final int verticalOffset;
-    
     private final int horizontalOffset;
-    
     private final AnsiFormat format;
-    
 
     public ShadowTreeNodeDecorator(TreeNode baseNode) {
         this(baseNode, builder());
@@ -63,7 +39,6 @@ public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
     public static Builder builder() {
         return new Builder();
     }
-    
 
     @Override
     public ConsoleText decoratedContent() {
@@ -72,61 +47,69 @@ public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
         Dimensions baseDimensions = baseContent.dimensions();
         int baseWidth = baseDimensions.width();
         int baseHeight = baseDimensions.height();
-        
-        String shadowLine = buildShadowLine(baseWidth);
-        String shadowEmptyPrefix = buildShadowEmptyPrefix();
-        String emptyPrefix = buildEmptyPrefix();
-        String shadowPrefix = buildShadowPrefix();
-        String shadowSuffix = buildShadowSuffix();
-        
+
         StringBuilder resultBuilder = new StringBuilder();
 
-        int topStart = Math.min(0, verticalOffset);
-        int topEnd = Math.min(0, baseHeight + verticalOffset);
-        int middleStart = Math.max(0, Math.min(baseHeight, verticalOffset));
-        int middleEnd = Math.max(0, Math.min(baseHeight, baseHeight + verticalOffset));
-        int bottomStart = Math.max(baseHeight, verticalOffset);
-        int bottomEnd = Math.max(baseHeight, baseHeight + verticalOffset);
-
-        for (int i = topStart; i < topEnd; i++) {
-            resultBuilder.append(shadowEmptyPrefix);
-            resultBuilder.append(shadowLine);
-            resultBuilder.append('\n');
-        }
-        for (int i = topEnd; i < 0; i++) {
-            resultBuilder.append('\n');
-        }
-        
-        for (int i = 0; i < middleStart; i++) {
-            resultBuilder.append(emptyPrefix);
-            resultBuilder.append(baseLines[i].ansi());
-            resultBuilder.append('\n');
-        }
-        for (int i = middleStart; i < middleEnd; i++) {
-            resultBuilder.append(formatShadow(shadowPrefix).ansi());
-            resultBuilder.append(baseLines[i].ansi());
-            TextUtil.repeat(resultBuilder, ' ', baseWidth - baseLines[i].dimensions().width());
-            resultBuilder.append(formatShadow(shadowSuffix).ansi());
-            resultBuilder.append('\n');
-        }
-        for (int i = middleEnd; i < baseHeight; i++) {
-            resultBuilder.append(emptyPrefix);
-            resultBuilder.append(baseLines[i].ansi());
-            resultBuilder.append('\n');
-        }
-
-        for (int i = baseHeight; i < bottomStart; i++) {
-            resultBuilder.append('\n');
-        }
-        for (int i = bottomStart; i < bottomEnd; i++) {
-            resultBuilder.append(shadowEmptyPrefix);
-            resultBuilder.append(formatShadow(shadowLine).ansi());
-            resultBuilder.append('\n');
-        }
+        drawShadowTop(resultBuilder, baseHeight, baseWidth);
+        drawContentWithShadow(resultBuilder, baseLines, baseWidth, baseHeight);
+        drawShadowBottom(resultBuilder, baseHeight, baseWidth);
 
         String decoratedContent = resultBuilder.toString();
         boolean isPlain = (baseNode instanceof PlainConsoleText) && (format == AnsiFormat.NONE);
         return isPlain ? ConsoleText.of(decoratedContent) : ConsoleText.ofAnsi(decoratedContent);
+    }
+
+    private void drawShadowTop(StringBuilder builder, int baseHeight, int baseWidth) {
+        String shadowLine = buildShadowLine(baseWidth);
+        String shadowEmptyPrefix = buildShadowEmptyPrefix();
+
+        int topStart = Math.min(0, verticalOffset);
+        int topEnd = Math.min(0, baseHeight + verticalOffset);
+
+        for (int i = topStart; i < topEnd; i++) {
+            builder.append(shadowEmptyPrefix).append(shadowLine).append('\n');
+        }
+        for (int i = topEnd; i < 0; i++) {
+            builder.append('\n');
+        }
+    }
+
+    private void drawContentWithShadow(StringBuilder builder, ConsoleText[] baseLines, int baseWidth, int baseHeight) {
+        String emptyPrefix = buildEmptyPrefix();
+        String shadowPrefix = buildShadowPrefix();
+        String shadowSuffix = buildShadowSuffix();
+
+        int middleStart = Math.max(0, Math.min(baseHeight, verticalOffset));
+        int middleEnd = Math.max(0, Math.min(baseHeight, baseHeight + verticalOffset));
+
+        for (int i = 0; i < middleStart; i++) {
+            builder.append(emptyPrefix).append(baseLines[i].ansi()).append('\n');
+        }
+        for (int i = middleStart; i < middleEnd; i++) {
+            builder.append(formatShadow(shadowPrefix).ansi());
+            builder.append(baseLines[i].ansi());
+            TextUtil.repeat(builder, ' ', baseWidth - baseLines[i].dimensions().width());
+            builder.append(formatShadow(shadowSuffix).ansi());
+            builder.append('\n');
+        }
+        for (int i = middleEnd; i < baseHeight; i++) {
+            builder.append(emptyPrefix).append(baseLines[i].ansi()).append('\n');
+        }
+    }
+
+    private void drawShadowBottom(StringBuilder builder, int baseHeight, int baseWidth) {
+        String shadowLine = buildShadowLine(baseWidth);
+        String shadowEmptyPrefix = buildShadowEmptyPrefix();
+
+        int bottomStart = Math.max(baseHeight, verticalOffset);
+        int bottomEnd = Math.max(baseHeight, baseHeight + verticalOffset);
+
+        for (int i = baseHeight; i < bottomStart; i++) {
+            builder.append('\n');
+        }
+        for (int i = bottomStart; i < bottomEnd; i++) {
+            builder.append(shadowEmptyPrefix).append(formatShadow(shadowLine).ansi()).append('\n');
+        }
     }
 
     private ConsoleText formatShadow(String shadowText) {
@@ -138,37 +121,21 @@ public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
     }
 
     private String buildShadowEmptyPrefix() {
-        if (horizontalOffset <= 0) {
-            return "";
-        }
-        
-        return TextUtil.repeat(EMPTY_CHAR, horizontalOffset);
+        return horizontalOffset <= 0 ? "" : TextUtil.repeat(EMPTY_CHAR, horizontalOffset);
     }
 
     private String buildEmptyPrefix() {
-        if (horizontalOffset >= 0) {
-            return "";
-        }
-        
-        return TextUtil.repeat(EMPTY_CHAR, -horizontalOffset);
+        return horizontalOffset >= 0 ? "" : TextUtil.repeat(EMPTY_CHAR, -horizontalOffset);
     }
 
     private String buildShadowPrefix() {
-        if (horizontalOffset >= 0) {
-            return "";
-        }
-        
-        return TextUtil.repeat(shadowChar, -horizontalOffset);
+        return horizontalOffset >= 0 ? "" : TextUtil.repeat(shadowChar, -horizontalOffset);
     }
-    
+
     private String buildShadowSuffix() {
-        if (horizontalOffset <= 0) {
-            return "";
-        }
-        
-        return TextUtil.repeat(shadowChar, horizontalOffset);
+        return horizontalOffset <= 0 ? "" : TextUtil.repeat(shadowChar, horizontalOffset);
     }
-    
+
     @Override
     public Insets insets() {
         Insets shadowInsets = new Insets(
@@ -178,7 +145,7 @@ public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
                 Math.max(0, -horizontalOffset));
         return baseNode.insets().extendedWith(shadowInsets);
     }
-    
+
     @Override
     protected TreeNode wrapChild(TreeNode childNode, int index) {
         return builder()
@@ -190,24 +157,15 @@ public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
                 .format(format)
                 .buildFor(childNode);
     }
-    
+
     public static class Builder {
-        
+
         private boolean inherit = true;
-        
         private boolean decorable = true;
-
-        private char shadowChar =
-                UnicodeMode.isUnicodeDefault() ?
-                UNICODE_SHADOW_CHAR :
-                ASCII_SHADOW_CHAR;
-        
+        private char shadowChar = UnicodeMode.isUnicodeDefault() ? UNICODE_SHADOW_CHAR : ASCII_SHADOW_CHAR;
         private int verticalOffset = 1;
-        
         private int horizontalOffset = 1;
-        
         private AnsiFormat format = AnsiFormat.NONE;
-
 
         public Builder inherit(boolean inherit) {
             this.inherit = inherit;
@@ -242,7 +200,5 @@ public class ShadowTreeNodeDecorator extends AbstractTreeNodeDecorator {
         public ShadowTreeNodeDecorator buildFor(TreeNode node) {
             return new ShadowTreeNodeDecorator(node, this);
         }
-        
     }
-    
 }
