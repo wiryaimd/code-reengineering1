@@ -1,7 +1,6 @@
 package hu.webarticum.treeprinter.text;
 
 public class PlainLineMerger implements LineMerger {
-
     @Override
     public String merge(String existingLine, int fromPosition, String replacement) {
         String beforePart = buildBeforePart(existingLine, fromPosition);
