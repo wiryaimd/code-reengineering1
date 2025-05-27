@@ -55,6 +55,8 @@ public class LineBuffer {
         }
     }
 
+    // Smells yang ada:
+    // 1. Dispensable, duplicate code: Solusi, extract method
     private void flushThrows(int untilRowIndex) throws IOException {
         if (untilRowIndex <= flushedRowCount) {
             return;
@@ -63,21 +65,21 @@ public class LineBuffer {
         int currentLineCount = lines.size();
         int deleteLineCount = untilRowIndex - flushedRowCount;
         if (currentLineCount <= deleteLineCount) {
-            for (String line: lines) {
-                out.append(line + "\n");
-            }
+            // treatment extract method
+            appendLine(lines.size());
             lines.clear();
         } else {
-            for (int i = 0; i < deleteLineCount; i++) {
-                String line = lines.get(i);
-                out.append(line + "\n");
-            }
+            appendLine(deleteLineCount);
             lines = new ArrayList<>(lines.subList(deleteLineCount, currentLineCount));
         }
         
         flushedRowCount = untilRowIndex;
     }
-    
+
+    private void appendLine(int size) throws IOException {
+        for(int i = 0; i < size; i++) out.append(lines.get(i) + "\n");
+    }
+
     private void writeLine(int row, int col, String textLine) {
         if (row < flushedRowCount) {
             return;
@@ -94,7 +96,9 @@ public class LineBuffer {
             }
             originalLine = "";
         }
-        String newLine = lineMerger.merge(originalLine, col, textLine);
+
+        // Long Parameter List, Treatment: Peserve Whole Object
+        String newLine = lineMerger.merge(new Replacer(originalLine, col, textLine));
         lines.set(lineIndex, newLine);
     }
     
