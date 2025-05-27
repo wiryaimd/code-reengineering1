@@ -14,10 +14,7 @@ import hu.webarticum.treeprinter.text.PlainLineMerger;
 
 public final class Util {
     
-    private Util() {
-        // utility class
-    }
-
+    private Util() {}
 
     public static String getStringContent(ConsoleText content, AnsiMode ansiMode) {
         return ansiMode.isEnabled() ? content.ansi() : content.plain();
@@ -32,26 +29,30 @@ public final class Util {
         return new LineBuffer(out, lineMerger, ansiMode);
     }
     
+    // Smells Long Method: Solusi, Extract Method
     public static int getDepth(TreeNode treeNode) {
         List<TreeNode> levelNodes = new ArrayList<>();
         levelNodes.add(treeNode);
         int depth = 0;
         while (true) {
-            List<TreeNode> newLevelNodes = new ArrayList<>();
-            for (TreeNode levelNode: levelNodes) {
-                for (TreeNode childNode: levelNode.children()) {
-                    if (childNode != null) {
-                        newLevelNodes.add(childNode);
-                    }
-                }
-            }
+            // extract method getLevelNodes()
+            List<TreeNode> newLevelNodes = getLevelNodes(levelNodes);
             if (newLevelNodes.isEmpty()) {
                 break;
             }
+            
             levelNodes = newLevelNodes;
             depth++;
         }
         return depth;
+    }
+
+    private static List<TreeNode> getLevelNodes(List<TreeNode> levelNodes) {
+        List<TreeNode> newLevelNodes = new ArrayList<>();
+        for (TreeNode levelNode: levelNodes) {
+            newLevelNodes.addAll(levelNode.children());
+        }
+        return newLevelNodes;
     }
 
     public static void write(Appendable out, String content) {
