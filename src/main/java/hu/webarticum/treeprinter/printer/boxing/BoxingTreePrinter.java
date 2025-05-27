@@ -169,8 +169,8 @@ public class BoxingTreePrinter implements TreePrinter {
         int bottomOffset = getTopHeight(dimensions) + subDimensions.height() + insets.bottom();
 
         writeBottom(lineBuffer, level, bottomOffset, innerWidth);
-        writeLeft(lineBuffer, level, verticalLineTop, verticalLineHeight);
-        writeRight(lineBuffer, level, innerWidth + 1, verticalLineTop, verticalLineHeight);
+        writeVerticalLine(lineBuffer, level, 0, verticalLineTop, verticalLineHeight,left);
+        writeVerticalLine(lineBuffer, level, innerWidth + 1, verticalLineTop, verticalLineHeight,right);
         lineBuffer.flush();
         return resultBuilder.toString();
     }
@@ -268,17 +268,10 @@ public class BoxingTreePrinter implements TreePrinter {
         lineBuffer.write(topOffset, 0, formatLining(composeBeddingString(innerWidth), level));
     }
 
-    private void writeLeft(LineBuffer lineBuffer, int level, int topOffset, int height) {
-        int until = topOffset + height;
-        for (int i = topOffset; i < until; i++) {
-            lineBuffer.write(i, 0, formatLining(left, level));
-        }
-    }
-
-    private void writeRight(LineBuffer lineBuffer, int level, int leftOffset, int topOffset, int height) {
-        int until = topOffset + height;
-        for (int i = topOffset; i < until; i++) {
-            lineBuffer.write(i, leftOffset, formatLining(right, level));
+    private void writeVerticalLine(LineBuffer lineBuffer, int level,
+                                   int leftOffset, int topOffset, int height,char c){
+        for (int i = topOffset; i < topOffset + height; i++) {
+            lineBuffer.write(i, leftOffset, formatLining(c, level));
         }
     }
     
