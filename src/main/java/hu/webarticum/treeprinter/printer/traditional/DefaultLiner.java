@@ -4,7 +4,6 @@ import java.util.List;
 
 import hu.webarticum.treeprinter.UnicodeMode;
 import hu.webarticum.treeprinter.text.AnsiFormat;
-import hu.webarticum.treeprinter.text.ConsoleText;
 import hu.webarticum.treeprinter.text.LineBuffer;
 
 /**
@@ -103,94 +102,114 @@ public class DefaultLiner implements Liner {
     
     @Override
     public int printConnections(LineBuffer buffer, int row, int topConnection, List<Integer> bottomConnections) {
-        int start = Math.min(topConnection, bottomConnections.get(0));
-        int end = Math.max(topConnection, bottomConnections.get(bottomConnections.size() - 1));
-        int topHeightWithBracket = topHeight + (displayBracket ? 1 : 0);
-        int fullHeight = topHeightWithBracket + bottomHeight;
+        LineWriter writer = new LineWriter(buffer);
+        ConnectionLayout layout = new ConnectionLayout(
+            topConnection, bottomConnections, topHeight, bottomHeight, displayBracket);
         
-        printTopConnection(buffer, row, topConnection);
-        printConnectionBracketLine(buffer, row, start, end, topConnection, bottomConnections);
-        printBottomConnections(buffer, row, start, topHeightWithBracket, fullHeight, bottomConnections);
+        // Write top vertical line
+        writer.writeVerticalLine(
+            row, 
+            topConnection, 
+            layout.getTopHeight(), 
+            new LineContent(topConnectionChar, format)
+        );
         
-        return fullHeight;
-    }
-    
-    private void printTopConnection(LineBuffer buffer, int row, int topConnection) {
-        for (int i = 0; i < topHeight; i++) {
-            buffer.write(row + i, topConnection, formatLining(topConnectionChar));
+        // Write bracket line
+        if (displayBracket) {
+            String bracketLine = generateBracketLine(layout);
+            writer.writeHorizontalLine(
+                row + layout.getTopHeight(),
+                layout.getStart(),
+                bracketLine,
+                new LineContent(bracketLine, format)
+            );
         }
+        
+        // Write bottom connections
+        String bottomConnectionsLine = generateBottomConnectionsLine(layout);
+        writer.writeBottomConnections(
+            row + layout.getTopHeightWithBracket(),
+            layout.getStart(),
+            bottomConnectionsLine,
+            new LineContent(bottomConnectionsLine, format),
+            layout.getBottomHeight()
+        );
+        
+        return layout.getFullHeight();
     }
     
-    private void printConnectionBracketLine(LineBuffer buffer, int row, int start, int end, int topConnection, List<Integer> bottomConnections) {
+    private String generateBracketLine(ConnectionLayout layout) {
         StringBuilder bracketLineBuilder = new StringBuilder();
+        int start = layout.getStart();
+        int end = layout.getEnd();
+        int topConnection = layout.getTopConnection();
+        
         for (int i = start; i <= end; i++) {
-            char lineCharacter = getNthBracketLineChar(i, start, end, topConnection, bottomConnections);
+            char lineCharacter = getNthBracketLineChar(i, layout);
             bracketLineBuilder.append(lineCharacter);
         }
-        buffer.write(row + topHeight, start, formatLining(bracketLineBuilder.toString()));
+        return bracketLineBuilder.toString();
     }
     
-    private char getNthBracketLineChar(int i, int start, int end, int topConnection, List<Integer> bottomConnections) {
+    private char getNthBracketLineChar(int position, ConnectionLayout layout) {
+        int start = layout.getStart();
+        int end = layout.getEnd();
+        int topConnection = layout.getTopConnection();
+        
         if (start == end) {
             return bracketOnlyChar;
-        } else if (i == topConnection) {
-            return getBracketLineCharAtTopConnection(topConnection, start, end, bottomConnections);
-        } else if (i == start) {
+        } else if (position == topConnection) {
+            return getBracketLineCharAtTopConnection(position, layout);
+        } else if (position == start) {
             return bracketLeftChar;
-        } else if (i == end) {
+        } else if (position == end) {
             return bracketRightChar;
-        } else if (bottomConnections.contains(i)) {
+        } else if (layout.hasBottomConnection(position)) {
             return bracketBottomChar;
         } else {
             return bracketChar;
         }
     }
     
-    private char getBracketLineCharAtTopConnection(int i, int start, int end, List<Integer> bottomConnections) {
-        if (bottomConnections.contains(i)) {
-            if (i == start) {
+    private char getBracketLineCharAtTopConnection(int position, ConnectionLayout layout) {
+        int start = layout.getStart();
+        int end = layout.getEnd();
+        boolean hasBottomConnection = layout.hasBottomConnection(position);
+        
+        if (hasBottomConnection) {
+            if (position == start) {
                 return bracketTopAndBottomLeftChar;
-            } else if (i == end) {
+            } else if (position == end) {
                 return bracketTopAndBottomRightChar;
             } else {
                 return bracketTopAndBottomChar;
             }
         } else {
-            if (i == start) {
+            if (position == start) {
                 return bracketTopLeftChar;
-            } else if (i == end) {
+            } else if (position == end) {
                 return bracketTopRightChar;
             } else {
                 return bracketTopChar;
             }
         }
     }
-
-    private void printBottomConnections(LineBuffer buffer, int row, int start, int topHeightWithBracket, int fullHeight, List<Integer> bottomConnections) {
+    
+    private String generateBottomConnectionsLine(ConnectionLayout layout) {
         StringBuilder bottomConnectionLineBuilder = new StringBuilder();
-        int position = start;
-        for (int bottomConnection: bottomConnections) {
+        int position = layout.getStart();
+        
+        for (int bottomConnection : layout.getBottomConnections()) {
             for (int i = position; i < bottomConnection; i++) {
                 bottomConnectionLineBuilder.append(' ');
             }
             bottomConnectionLineBuilder.append(bottomConnectionChar);
             position = bottomConnection + 1;
         }
-        ConsoleText bottomConnectionLineContent = formatLining(bottomConnectionLineBuilder.toString());
-        for (int i = topHeightWithBracket; i < fullHeight; i++) {
-            buffer.write(row + i, start, bottomConnectionLineContent);
-        }
+        
+        return bottomConnectionLineBuilder.toString();
     }
 
-    private ConsoleText formatLining(char liningChar) {
-        return formatLining("" + liningChar);
-    }
-    
-    private ConsoleText formatLining(String liningText) {
-        return ConsoleText.of(liningText).format(format);
-    }
-    
-    
     public static class Builder {
 
         private int topHeight = 0;
