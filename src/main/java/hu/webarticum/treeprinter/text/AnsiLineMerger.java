@@ -10,9 +10,9 @@ import java.util.regex.Pattern;
  * @see AnsiFormat
  */
 public class AnsiLineMerger implements LineMerger {
-    private static final char ESCAPE_CHAR = '\u001B';
-    private static final Pattern ANSI_ESCAPE_PATTERN = Pattern.compile("^\\e(?:\\[[0-9;]*m)?");
-    private static final String ANSI_RESET = TextUtil.ansiReset();
+    private static final char ESCAPE_CHAR = TextPatterns.getEscapeChar();
+    private static final Pattern ANSI_ESCAPE_PATTERN = TextPatterns.getAnsiEscapes2Char();
+    private static final String ANSI_RESET = TextPatterns.getEscapeChar();
 
     // Smells yang ada:
     // 1. Long Parameter List: Solusi, introduce parameter object
