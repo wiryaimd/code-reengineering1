@@ -79,6 +79,42 @@ public class Insets {
                 this.left + other.left);
     }
     
+    public boolean isSymmetrical() {
+        return top == bottom && left == right;
+    }
+    
+    public int getTotalPadding() {
+        return top + right + bottom + left;
+    }
+    
+    public void applyTo(StringBuilder content) {
+        addVerticalPadding(content, top, true);
+        addHorizontalPadding(content, left, right);
+        addVerticalPadding(content, bottom, false);
+    }
+    
+    private void addVerticalPadding(StringBuilder content, int size, boolean isTop) {
+        for (int i = 0; i < size; i++) {
+            if (isTop) {
+                content.insert(0, "\n");
+            } else {
+                content.append("\n");
+            }
+        }
+    }
+    
+    private void addHorizontalPadding(StringBuilder content, int leftPad, int rightPad) {
+        String[] lines = content.toString().split("\n");
+        StringBuilder result = new StringBuilder();
+        String leftPadding = " ".repeat(leftPad);
+        String rightPadding = " ".repeat(rightPad);
+        
+        for (String line : lines) {
+            result.append(leftPadding).append(line).append(rightPadding).append("\n");
+        }
+        content.setLength(0);
+        content.append(result);
+    }
     
     public static class Builder {
 
