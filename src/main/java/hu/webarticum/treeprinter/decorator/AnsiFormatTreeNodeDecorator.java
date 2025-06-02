@@ -6,6 +6,11 @@ import hu.webarticum.treeprinter.text.ConsoleText;
 
 /**
  * {@link TreeNode} decorator implementation that applies an {@link AnsiFormat} on the node.
+ * 
+ * @see TreeNodeDecorator
+ * @see TreeNodeDecorator.Builder
+ * @see TreeNode#content()
+ * @see AnsiFormat
  */
 public class AnsiFormatTreeNodeDecorator extends AbstractTreeNodeDecorator {
 

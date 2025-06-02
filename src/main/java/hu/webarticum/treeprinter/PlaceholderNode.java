@@ -6,7 +6,12 @@ import java.util.List;
 import hu.webarticum.treeprinter.text.ConsoleText;
 
 /**
- * Very simple {@link TreeNode} implementation which is placeholder and non-decorable
+ * 
+ * This is a default implementation for placeholder nodes.
+ * 
+ * @see TreeNode
+ * @see TreePrinter
+ * @see TreePrinter.Builder
  */
 public class PlaceholderNode implements TreeNode {
 

@@ -6,6 +6,11 @@ import hu.webarticum.treeprinter.printer.TreePrinter;
  * Shared static class for managing global ANSI output mode.
  * 
  * Built-in {@link TreePrinter} implementations use this setting.
+ * 
+ * @see TreePrinter
+ * @see TreePrinter.Builder
+ * @see TreeNode#content()
+ * @see AnsiFormat
  */
 public enum AnsiMode {
     

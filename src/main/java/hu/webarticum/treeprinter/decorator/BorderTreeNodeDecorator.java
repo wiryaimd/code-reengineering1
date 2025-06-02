@@ -24,6 +24,12 @@ import hu.webarticum.treeprinter.text.TextUtil;
  * │Hello, Node!│
  * └────────────┘
  * </pre>
+ * 
+ * @see TreeNode
+ * @see TreeNodeDecorator
+ * @see TreeNodeDecorator.Builder
+ * @see TreeNode#content()
+ * @see AnsiFormat
  */
 public class BorderTreeNodeDecorator extends AbstractTreeNodeDecorator {
 

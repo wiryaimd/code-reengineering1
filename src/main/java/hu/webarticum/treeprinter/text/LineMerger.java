@@ -1,5 +1,10 @@
 package hu.webarticum.treeprinter.text;
 
+/**
+ * Functional interface for merging lines of text.
+ * 
+ * @see Replacer
+ */
 @FunctionalInterface
 public interface LineMerger {
 

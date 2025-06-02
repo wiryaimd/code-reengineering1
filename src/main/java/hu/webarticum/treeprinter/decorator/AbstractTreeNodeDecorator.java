@@ -13,15 +13,16 @@ import hu.webarticum.treeprinter.text.ConsoleText;
  * Decorators should only effect if the wrapped node is decorable.
  * Decorators should inherit by default (wrap their children with a similar decorator),
  * and should not inherit when the <code>inherit</code> option is set to <code>false</code>.
+ * 
+ * @see TreeNodeDecorator
+ * @see TreeNodeDecorator.Builder
+ * @see TreeNode
  */
 public abstract class AbstractTreeNodeDecorator implements TreeNode {
     
     protected final TreeNode baseNode;
-    
     protected final boolean inherit;
-
     protected final boolean decorable;
-    
 
     protected AbstractTreeNodeDecorator(TreeNode baseNode) {
         this(baseNode, true);

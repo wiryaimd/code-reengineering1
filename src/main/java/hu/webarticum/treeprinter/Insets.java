@@ -2,20 +2,16 @@ package hu.webarticum.treeprinter;
 
 /**
  * Value class for storing inset values at top, right, bottom and left
+ * 
+ * @see TreeNode#insets()
  */
 public class Insets {
     
     public static final Insets EMPTY = new Insets(0);
-    
-    
     private final int top;
-    
     private final int right;
-    
     private final int bottom;
-    
     private final int left;
-    
     
     public Insets(int inset) {
         this(inset, inset, inset, inset);

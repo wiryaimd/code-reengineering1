@@ -2,6 +2,11 @@ package hu.webarticum.treeprinter.text;
 
 import java.util.regex.Matcher;
 
+/**
+ * Utility class for formatting ANSI text.
+ * 
+ * @see AnsiFormat
+ */
 public class AnsiTextFormatter {
     private static final String ANSI_RESET = "\u001B[0m";
     

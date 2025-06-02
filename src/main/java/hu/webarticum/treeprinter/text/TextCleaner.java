@@ -3,6 +3,11 @@ package hu.webarticum.treeprinter.text;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class for cleaning text.
+ * 
+ * @see TextPatterns
+ */
 public class TextCleaner {
     private static final String TAB_SPACES = "    ";
     

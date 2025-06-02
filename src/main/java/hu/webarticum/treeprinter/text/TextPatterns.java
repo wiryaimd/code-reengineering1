@@ -2,6 +2,11 @@ package hu.webarticum.treeprinter.text;
 
 import java.util.regex.Pattern;
 
+/**
+ * Utility class for text patterns.
+ * 
+ * @see TextCleaner
+ */
 public class TextPatterns {
     private static final Pattern lineSeparator = Pattern.compile("\\R");
     private static final Pattern ansiEscape = Pattern.compile("\\e\\[[0-9;]*m");

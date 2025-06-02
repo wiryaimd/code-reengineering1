@@ -10,15 +10,10 @@ import hu.webarticum.treeprinter.util.Util;
 public class LineBuffer {
 
     private final Appendable out;
-    
     private final LineMerger lineMerger;
-    
     private final AnsiMode ansiMode;
-    
     private int flushedRowCount = 0;
-    
     private List<String> lines = new ArrayList<>();
-    
     
     public LineBuffer(Appendable out) {
         this(out, new PlainLineMerger());
@@ -33,7 +28,6 @@ public class LineBuffer {
         this.lineMerger = lineMerger;
         this.ansiMode = ansiMode;
     }
-    
     
     public void write(int row, int col, ConsoleText content) {
         ConsoleText[] textLines = TextUtil.linesOf(content);
@@ -100,6 +94,5 @@ public class LineBuffer {
         // Long Parameter List, Treatment: Peserve Whole Object
         String newLine = lineMerger.merge(new Replacer(originalLine, col, textLine));
         lines.set(lineIndex, newLine);
-    }
-    
+    }    
 }

@@ -52,44 +52,25 @@ public class BoxingTreePrinter implements TreePrinter {
 
 
     private final boolean displayPlaceholders;
-    
     private final char topLeft;
-    
     private final char top;
-    
     private final char topRight;
-    
     private final char right;
-    
     private final char bottomRight;
-    
     private final char bottom;
-    
     private final char bottomLeft;
-    
     private final char left;
-    
     private final char leftConnection;
-    
     private final char rightConnection;
-    
-    private final Set<Integer> horizontalLevels;
-
-    private final boolean boxLeafs;
-
+    private final Set<Integer> horizontalLevels
+    private final boolean boxLeafs
     private final Insets insets;
-
     private final int verticalGap;
-
     private final int horizontalGap;
-    
     private final AnsiMode ansiMode;
-    
     private final AnsiFormat defaultFormat;
-    
     private final Map<Integer, AnsiFormat> levelFormats;
     
-
     public BoxingTreePrinter() {
         this(builder());
     }

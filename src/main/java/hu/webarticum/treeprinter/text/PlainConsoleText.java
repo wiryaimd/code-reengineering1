@@ -1,10 +1,14 @@
 package hu.webarticum.treeprinter.text;
 
+/**
+ * Implementation of {@link ConsoleText} that represents plain text.
+ * 
+ * @see ConsoleText
+ * @see AnsiConsoleText
+ */
 public class PlainConsoleText implements ConsoleText {
-    
     private final String plainText;
     
-
     public PlainConsoleText(char plainChar) {
         this(plainChar + "");
     }
@@ -35,5 +39,4 @@ public class PlainConsoleText implements ConsoleText {
             return new AnsiConsoleText(this.plainText + consoleText.ansi(), false);
         }
     }
-
 }

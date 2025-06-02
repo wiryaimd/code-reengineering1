@@ -8,8 +8,6 @@ import hu.webarticum.treeprinter.text.ConsoleText;
 /**
  * Simple default implementation for {@link TreeNode}.
  * 
- * You can specify content and custom insets in the constructor.
- * Child nodes can be added after construction (so this class is partially mutable).
  */
 public class SimpleTreeNode implements TreeNode {
 

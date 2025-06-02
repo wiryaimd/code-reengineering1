@@ -3,12 +3,15 @@ package hu.webarticum.treeprinter.text;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Implementation of {@link LineMerger} that merges ANSI escape sequences.
+ * 
+ * @see LineMerger
+ * @see AnsiFormat
+ */
 public class AnsiLineMerger implements LineMerger {
-
     private static final char ESCAPE_CHAR = '\u001B';
-
     private static final Pattern ANSI_ESCAPE_PATTERN = Pattern.compile("^\\e(?:\\[[0-9;]*m)?");
-
     private static final String ANSI_RESET = TextUtil.ansiReset();
 
     // Smells yang ada:

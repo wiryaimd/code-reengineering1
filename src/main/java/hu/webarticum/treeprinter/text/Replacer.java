@@ -1,5 +1,11 @@
 package hu.webarticum.treeprinter.text;
 
+/**
+ * Value class for storing the existing line, the position to replace, and the replacement text.
+ * 
+ * @see LineMerger
+ */
+
 // Treatment introduce parameter object
 public class Replacer {
     private String existingLine;

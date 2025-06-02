@@ -5,9 +5,7 @@ import java.util.Arrays;
 public interface ConsoleText {
     
     public String plain();
-    
     public String ansi();
-    
     public ConsoleText concat(ConsoleText consoleText);
     
     public default ConsoleText concat(String content) {

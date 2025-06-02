@@ -1,5 +1,10 @@
 package hu.webarticum.treeprinter.text;
 
+/**
+ * Implementation of {@link LineMerger} that merges plain text.
+ * 
+ * @see LineMerger
+ */
 public class PlainLineMerger implements LineMerger {
     @Override
     public String merge(Replacer replacer) {
