@@ -1,5 +1,4 @@
 package hu.webarticum.treeprinter.text;
-
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
@@ -47,7 +46,7 @@ public class TextCleaner {
         }
         
         public TextCleaningChain replaceTabs() {
-            text = text.replace("\t", TAB_SPACES);
+            text = text.replace("\t", TextPatterns.getTabSpaces());
             return this;
         }
         

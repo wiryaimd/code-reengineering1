@@ -11,16 +11,6 @@ import java.text.Normalizer;
  * @see AnsiFormat
  */
 public class TextUtil {
-
-    private static final String ANSI_RESET = "\u001B[0m";
-    private static final Pattern LINE_SEPARATOR_PATTERN = Pattern.compile("\\R");
-    private static final Pattern ANSI_ESCAPE_PATTERN = Pattern.compile("\\e\\[[0-9;]*m");
-    private static final Pattern ANSI_ESCAPES_PATTERN = Pattern.compile("(?:\\e\\[[0-9;]*m)+");
-    private static final Pattern ASCII_CONTROL_PATTERN = Pattern.compile("[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]");
-    private static final Pattern ASCII_CONTROL_EXCEPT_FORMATTING_ESC_PATTERN =
-            Pattern.compile("([\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001A\\u001C-\\u001F]|\\e(?!\\[[0-9;]*m))");
-    private static final String TAB_SPACES = "    ";
-    
     private TextUtil() {
         // utility class
     }

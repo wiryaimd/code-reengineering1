@@ -8,8 +8,6 @@ import java.util.regex.Matcher;
  * @see AnsiFormat
  */
 public class AnsiTextFormatter {
-    private static final String ANSI_RESET = "\u001B[0m";
-    
     public static String stripAnsi(String ansiText) {
         String plainText = TextPatterns.getAnsiEscapePattern()
             .matcher(ansiText)
@@ -34,20 +32,20 @@ public class AnsiTextFormatter {
             if (!isEmpty) {
                 resultBuffer.append(formatString);
             }
-            boolean mustReset = !isEmpty && !ansiEscapes.startsWith(ANSI_RESET);
-            matcher.appendReplacement(resultBuffer, mustReset ? ANSI_RESET + ansiEscapes : ansiEscapes);
+            boolean mustReset = !isEmpty && !ansiEscapes.startsWith(TextPatterns.getAnsiResetPattern());
+            matcher.appendReplacement(resultBuffer, mustReset ? TextPatterns.getAnsiResetPattern() + ansiEscapes : ansiEscapes);
             endPos = matcher.end();
         }
         
         if (endPos < length) {
             resultBuffer.append(formatString);
             matcher.appendTail(resultBuffer);
-            resultBuffer.append(ANSI_RESET);
+            resultBuffer.append(TextPatterns.getAnsiResetPattern());
         }
         return resultBuffer.toString();
     }
     
     public static String ansiReset() {
-        return ANSI_RESET;
+        return TextPatterns.getAnsiResetPattern();
     }
 } 
