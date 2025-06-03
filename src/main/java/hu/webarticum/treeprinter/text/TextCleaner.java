@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * @see TextPatterns
  */
 public class TextCleaner {
-    private static final String TAB_SPACES = "    ";
+    private static final String TAB_SPACES = TextPatterns.getTabSpaces();
     
     public enum CleaningMode {
         PLAIN,
